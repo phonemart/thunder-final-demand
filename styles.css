@@ -907,12 +907,15 @@ table.detail tr + tr td { border-top: 1px solid var(--line); }
     print-color-adjust: exact !important;
   }
 
-  /* Page setup — let browser default margin take over so content
-     doesn't get clipped on edge. User can choose Margins: None for
-     edge-to-edge printing of the red banner. */
+  /* Page setup
+     - Page 1: edge-to-edge (red banner full-bleed)
+     - Page 2+: top margin so content doesn't kiss the paper edge */
   @page {
     size: A4;
-    margin: 0;
+    margin: 14mm 0 0 0;
+  }
+  @page :first {
+    margin-top: 0;
   }
 }
 
