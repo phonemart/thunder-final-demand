@@ -354,7 +354,7 @@ button { font-family: inherit; cursor: pointer; }
   width: 360px;
   height: 360px;
   transform: translate(-50%, -50%);
-  background-image: url('logo.png');
+  background-image: url('logo.png?v=3');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
