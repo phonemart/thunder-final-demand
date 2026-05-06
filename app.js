@@ -353,7 +353,7 @@ function renderPreview() {
 
       <div class="content">
         <div class="company">
-          <div class="logo"><img src="logo.png?v=4" alt="Thunder Cloud"></div>
+          <div class="logo"><img src="logo.png?v=5" alt="Thunder Cloud"></div>
           <div class="name">
             <h2>บริษัท ธันเดอร์คลาวด์ จำกัด</h2>
             <div class="en">THUNDER CLOUD CO., LTD.  ·  เลขนิติบุคคล 0105568121078</div>
@@ -477,7 +477,7 @@ function renderPreview() {
         <div class="signature">
           <div class="stamp">
             <span class="ring"></span>
-            <img src="logo.png?v=4" alt="">
+            <img src="logo.png?v=5" alt="">
             <b>THUNDER CLOUD</b>
             <span>CO., LTD.</span>
           </div>

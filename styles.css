@@ -354,7 +354,7 @@ button { font-family: inherit; cursor: pointer; }
   width: 360px;
   height: 360px;
   transform: translate(-50%, -50%);
-  background-image: url('logo.png?v=4');
+  background-image: url('logo.png?v=5');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
@@ -420,16 +420,17 @@ button { font-family: inherit; cursor: pointer; }
 
 /* Company */
 .company {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  gap: 16px;
   align-items: center;
   margin-top: 18px;
   padding-bottom: 14px;
   border-bottom: 2px solid var(--red);
 }
 .company .logo {
-  width: 110px;
-  height: 110px;
+  width: 88px;
+  height: 88px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -441,26 +442,32 @@ button { font-family: inherit; cursor: pointer; }
   object-fit: contain;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.08));
 }
-.company .name { flex: 1; padding: 0 16px; }
+.company .name { min-width: 0; }
 .company .name h2 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--ink);
-  margin-bottom: 2px;
+  line-height: 1.15;
+  margin-bottom: 4px;
+  white-space: nowrap;
 }
 .company .name .en {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 1.2px;
+  letter-spacing: 1px;
   color: var(--gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .company .contact {
   text-align: right;
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--ink-soft);
   line-height: 1.7;
+  max-width: 240px;
 }
-.company .contact b { color: var(--ink); }
+.company .contact b { color: var(--ink); font-weight: 700; display: inline-block; min-width: 80px; }
 
 /* Recipient */
 .recipient {
