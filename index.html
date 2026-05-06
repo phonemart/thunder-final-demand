@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Demand Letter · Thunder Cloud</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="icon">⚡</div>
+      <h1>
+        Thunder Cloud
+        <span>Final Demand Letter</span>
+      </h1>
+    </div>
+    <div id="customerList" class="customer-list"></div>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main">
+    <div id="toolbar" class="toolbar">
+      <div id="breadcrumb" class="breadcrumb">—</div>
+      <div class="tools">
+        <button id="btnImport" class="btn" title="นำเข้า JSON">📥 นำเข้า</button>
+        <button id="btnExport" class="btn" title="สำรองเป็น JSON">💾 สำรอง</button>
+        <button id="btnDuplicate" class="btn" title="ทำสำเนาลูกค้านี้">📋 สำเนา</button>
+        <button id="btnEdit" class="btn">✓ ปิดแก้ไข</button>
+        <button id="btnPrint" class="btn primary">🖨️ พิมพ์ / PDF</button>
+      </div>
+    </div>
+    <div id="editPanel" class="edit-panel"></div>
+    <div id="previewArea" class="preview-area"></div>
+  </main>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
