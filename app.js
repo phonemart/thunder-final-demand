@@ -26,6 +26,7 @@ const DEFAULT_CUSTOMERS = [
     overdue_amount: '',
     compensation_days: '',
     total_due: '',
+    discounted_amount: '',
     bank_account: '',
   },
 ];
@@ -127,6 +128,7 @@ function addCustomer() {
     overdue_amount: '',
     compensation_days: '',
     total_due: '',
+    discounted_amount: '',
     bank_account: '',
   };
   state.customers.push(c);
@@ -272,6 +274,10 @@ function renderEditPanel() {
       <label>ยอดรวมที่ต้องชำระทั้งสิ้น (บาท)</label>
       <input data-fld="total_due" value="${v('total_due')}" placeholder="เช่น 6,600">
     </div>
+    <div class="field wide">
+      <label>ยอดปรับลด (ถ้าชำระภายใน 7 วัน) (บาท)</label>
+      <input data-fld="discounted_amount" value="${v('discounted_amount')}" placeholder="เช่น 5,000">
+    </div>
 
     <div class="edit-section">
       <h3>ช่องทางชำระเงิน</h3>
@@ -325,6 +331,9 @@ function renderPreview() {
   const totalDue = c.total_due
     ? `${formatBaht(c.total_due)}`
     : '<span class="placeholder">_______________</span>';
+  const discounted = c.discounted_amount
+    ? `${formatBaht(c.discounted_amount)}`
+    : '<span class="placeholder">_______________</span>';
   const bankAcc = c.bank_account
     ? `<span style="letter-spacing:1px">${escapeHtml(c.bank_account)}</span>`
     : '<span style="letter-spacing:1px">____-____-____</span>';
@@ -353,7 +362,7 @@ function renderPreview() {
 
       <div class="content">
         <div class="company">
-          <div class="logo"><img src="logo.png?v=5" alt="Thunder Cloud"></div>
+          <div class="logo"><img src="logo.png?v=6" alt="Thunder Cloud"></div>
           <div class="name">
             <h2>บริษัท ธันเดอร์คลาวด์ จำกัด</h2>
             <div class="en">THUNDER CLOUD CO., LTD.  ·  เลขนิติบุคคล 0105568121078</div>
@@ -405,8 +414,16 @@ function renderPreview() {
         </table>
 
         <div class="total">
-          <div class="lbl">รวมยอดหนี้ที่ต้องชำระทั้งสิ้น</div>
-          <div class="amount">${totalDue}<span class="baht">บาท</span></div>
+          <div class="total-row">
+            <span class="total-label">ยอดค้างชำระทั้งหมด</span>
+            <span class="eq">=</span>
+            <span class="amount">${totalDue}<span class="baht">บาท</span></span>
+          </div>
+          <div class="promo">
+            หากติดต่อเข้ามาภายใน <b>7 วัน</b> เพื่อชำระยอด
+            ทางร้านยินดีปรับลดให้เหลือเพียง
+            <span class="promo-amount">${discounted}<span class="baht">บาท</span></span>
+          </div>
           <div class="note">* ไม่รวมดอกเบี้ย ค่าทนายความ และค่าใช้จ่ายในการดำเนินคดี</div>
         </div>
 
@@ -477,7 +494,7 @@ function renderPreview() {
         <div class="signature">
           <div class="stamp">
             <span class="ring"></span>
-            <img src="logo.png?v=5" alt="">
+            <img src="logo.png?v=6" alt="">
             <b>THUNDER CLOUD</b>
             <span>CO., LTD.</span>
           </div>

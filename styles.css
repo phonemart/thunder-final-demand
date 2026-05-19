@@ -640,6 +640,49 @@ table.detail tr + tr td { border-top: 1px solid var(--line); }
   font-weight: 600;
 }
 .total .amount .baht { font-size: 22px; margin-left: 8px; }
+.total .total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.total .total-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--red-deep);
+  letter-spacing: 0.5px;
+}
+.total .eq {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--red-deep);
+}
+.total .promo {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(139, 14, 14, 0.35);
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.total .promo-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--red-deep);
+  letter-spacing: 0.5px;
+  margin-left: 4px;
+}
+.total .promo-amount .baht {
+  font-size: 15px;
+  margin-left: 4px;
+  font-weight: 700;
+}
+.total .promo-amount .placeholder {
+  color: rgba(139, 14, 14, 0.4);
+  letter-spacing: 3px;
+  font-weight: 600;
+}
 .total .note {
   font-size: 10.5px;
   color: var(--gray);
