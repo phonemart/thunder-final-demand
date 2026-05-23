@@ -4,12 +4,67 @@ const STORAGE_KEY = 'thunder_demand_letters_v1';
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
+const COMPANIES = {
+  cloud: {
+    label: 'Thunder Cloud',
+    name_th: 'บริษัท ธันเดอร์คลาวด์ จำกัด',
+    name_en: 'THUNDER CLOUD CO., LTD.',
+    juristic_id: '0105568121078',
+    address: 'เลขที่ 23 ซ.พัฒนาการ 69 ประเวศ กทม. 10250',
+    phone: '098-018-9384',
+    email: 'legal@thundercloud.co.th',
+    line: '@thundercloud',
+    bank_name: 'บจก. ธันเดอร์คลาวด์',
+    default_bank_account: '',
+    default_ref_prefix: 'TC',
+    logo: 'logo.png?v=8',
+    stamp_th: 'THUNDER CLOUD',
+    business_desc: 'เช่าโทรศัพท์มือถือ',
+    contract_prefix: 'GW-XXXX',
+    period_label: 'งวด',
+    rate_row_label: 'ค่าเช่าตามสัญญา',
+    overdue_row_label: 'ยอดค่าเช่าค้างชำระ',
+    penalty_per_day: 100,
+    penalty_row_label: 'ค่าชดเชย ข้อ 13 (100 บ./วัน)',
+    show_total_periods: false,
+    criminal_html: `ความผิดฐาน "ฉ้อโกง" <span class="law-tag">ป.อาญา ม. 341</span> โทษจำคุกสูงสุด 3 ปี<br>
+                ความผิดฐาน "ยักยอกทรัพย์" <span class="law-tag">ป.อาญา ม. 352</span> โทษจำคุกสูงสุด 3 ปี และ/หรือปรับ`,
+    policy_html: '',
+  },
+  fin: {
+    label: 'Tunder Fin',
+    name_th: 'บริษัท ทันเด้อ ฟิน จำกัด',
+    name_en: 'TUNDER FIN CO., LTD.',
+    juristic_id: '0105568109868',
+    address: 'เลขที่ 23 ประเวศ เขตประเวศ กรุงเทพมหานคร 10250',
+    phone: '080-078-0804',
+    email: 'gr289514@gmail.com',
+    line: '@tunderfin',
+    bank_name: 'บจก.ทันเด้อ ฟิน',
+    default_bank_account: '215-3-35333-9',
+    default_ref_prefix: 'TF',
+    logo: 'logo-fin.png?v=8',
+    stamp_th: 'TUNDER FIN',
+    business_desc: 'เช่าซื้อโทรศัพท์มือถือ',
+    contract_prefix: 'TDL-XXXXXXX',
+    period_label: 'งวด',
+    rate_row_label: 'ค่างวดตามสัญญา',
+    overdue_row_label: 'ยอดค่างวดค้างชำระ',
+    penalty_per_day: 50,
+    penalty_row_label: 'ค่าปรับเกินกำหนด (50 บ./วัน)',
+    show_total_periods: true,
+    criminal_html: `ความผิดฐาน "ยักยอกทรัพย์เช่าซื้อ" <span class="law-tag">ป.อาญา ม. 356</span> โทษจำคุกไม่เกิน 3 ปี หรือปรับไม่เกิน 6,000 บาท หรือทั้งจำทั้งปรับ`,
+    policy_html: '',
+  },
+};
+
 const DEFAULT_CUSTOMERS = [
   {
     id: 'sample',
+    company: 'cloud',
     contract_type: '10day',
     ref_no: 'TC-LEGAL/2569/______',
-    letter_date: '____ ___________ 2569',
+    letter_date: '',
     customer_name: 'ตัวอย่าง · กดปุ่ม + เพิ่มลูกค้า เพื่อสร้างใหม่',
     id_card: '_-____-_____-__-_',
     address: '_________________________________',
@@ -22,6 +77,7 @@ const DEFAULT_CUSTOMERS = [
     total_price: '_____ บาท  (ระยะเวลาเช่า __ เดือน)',
     rate_unit: 'ราย 10 วัน',
     rate: '_____ บาท / รอบ 10 วัน',
+    total_periods: '',
     overdue_periods: '',
     overdue_amount: '',
     compensation_days: '',
@@ -59,6 +115,41 @@ function uid() {
   return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
+const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                     'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+function todayThai() {
+  const d = new Date();
+  return `${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`;
+}
+function todayISO() {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+function formatThaiDate(s) {
+  if (!s) return '';
+  const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return s; // not ISO — return as-is (legacy text)
+  const y = parseInt(m[1], 10);
+  const mo = parseInt(m[2], 10) - 1;
+  const d = parseInt(m[3], 10);
+  return `${d} ${THAI_MONTHS[mo]} ${y + 543}`;
+}
+function thaiBeYear() {
+  return new Date().getFullYear() + 543;
+}
+function genRefNo(company) {
+  const co = COMPANIES[company] || COMPANIES.cloud;
+  const prefix = co.default_ref_prefix || 'TC';
+  const count = state.customers.filter(x => (x.company || 'cloud') === company).length + 1;
+  const num = String(count).padStart(3, '0');
+  return `${prefix}-LEGAL/${thaiBeYear()}/${num}`;
+}
+function isDefaultRefNo(s) {
+  return /^(TC|TF)-LEGAL\/\d+\//.test(s || '');
+}
+
 function getCurrent() {
   return state.customers.find((c) => c.id === state.currentId);
 }
@@ -85,17 +176,21 @@ function renderList() {
     </div>
     ${state.customers
       .map(
-        (c) => `
+        (c) => {
+          const co = COMPANIES[c.company] || COMPANIES.cloud;
+          return `
       <div class="cust-card ${c.id === state.currentId ? 'active' : ''}"
            onclick="selectCustomer('${c.id}')">
         <span class="badge">${c.contract_type === 'monthly' ? 'รายเดือน' : 'ราย 10 วัน'}</span>
+        <span class="badge co-${escapeAttr(c.company || 'cloud')}">${escapeHtml(co.label)}</span>
         <div class="name">${escapeHtml(c.customer_name || '(ไม่ได้ระบุชื่อ)')}</div>
         <div class="meta">
           <b>${escapeHtml(c.contract_no || '—')}</b>
           <span>${escapeHtml(c.model || '—')}</span>
         </div>
         <button class="delete" onclick="event.stopPropagation(); deleteCustomer('${c.id}')">ลบ</button>
-      </div>`
+      </div>`;
+        }
       )
       .join('')}
   `;
@@ -107,11 +202,13 @@ function selectCustomer(id) {
 }
 
 function addCustomer() {
+  const company = 'cloud';
   const c = {
     id: uid(),
+    company,
     contract_type: '10day',
-    ref_no: 'TC-LEGAL/2569/______',
-    letter_date: '____ ___________ 2569',
+    ref_no: genRefNo(company),
+    letter_date: todayISO(),
     customer_name: '',
     id_card: '',
     address: '',
@@ -124,6 +221,7 @@ function addCustomer() {
     total_price: '',
     rate_unit: 'ราย 10 วัน',
     rate: '',
+    total_periods: '',
     overdue_periods: '',
     overdue_amount: '',
     compensation_days: '',
@@ -170,7 +268,20 @@ function renderEditPanel() {
 
   const v = (k) => escapeAttr(c[k] || '');
 
+  const companyVal = c.company || 'cloud';
   panel.innerHTML = `
+    <div class="edit-section">
+      <h3>บริษัทผู้ออกหนังสือ</h3>
+    </div>
+    <div class="field wide-2">
+      <label>บริษัท</label>
+      <select data-fld="company">
+        ${Object.entries(COMPANIES).map(([k, co]) =>
+          `<option value="${k}" ${companyVal === k ? 'selected' : ''}>${escapeHtml(co.name_th)} (${escapeHtml(co.label)})</option>`
+        ).join('')}
+      </select>
+    </div>
+
     <div class="edit-section">
       <h3>ประเภทสัญญา & เลขที่หนังสือ</h3>
     </div>
@@ -186,8 +297,8 @@ function renderEditPanel() {
       <input data-fld="ref_no" value="${v('ref_no')}">
     </div>
     <div class="field">
-      <label>วันที่ออกหนังสือ</label>
-      <input data-fld="letter_date" value="${v('letter_date')}" placeholder="เช่น 6 พฤษภาคม 2569">
+      <label>วันที่ออกหนังสือ <span class="hint">(แสดงเป็น พ.ศ. ในจดหมาย)</span></label>
+      <input type="date" data-fld="letter_date" value="${v('letter_date')}">
     </div>
 
     <div class="edit-section">
@@ -243,15 +354,19 @@ function renderEditPanel() {
     </div>
 
     <div class="edit-section">
-      <h3>ค่าเช่า</h3>
+      <h3>ค่าเช่า / ค่างวด</h3>
     </div>
     <div class="field">
-      <label>หน่วยค่าเช่า</label>
+      <label>หน่วย</label>
       <input data-fld="rate_unit" value="${v('rate_unit')}" placeholder="ราย 10 วัน / รายเดือน">
     </div>
-    <div class="field wide-2">
-      <label>อัตราค่าเช่า</label>
-      <input data-fld="rate" value="${v('rate')}">
+    <div class="field">
+      <label>อัตรา</label>
+      <input data-fld="rate" value="${v('rate')}" placeholder="เช่น 2,230 บาท / งวด">
+    </div>
+    <div class="field">
+      <label>จำนวนงวดทั้งหมด <span class="hint">(เฉพาะ Fin)</span></label>
+      <input data-fld="total_periods" value="${v('total_periods')}" placeholder="เช่น 10">
     </div>
 
     <div class="edit-section">
@@ -267,7 +382,7 @@ function renderEditPanel() {
       <input data-fld="overdue_amount" value="${v('overdue_amount')}" placeholder="เช่น 5,400">
     </div>
     <div class="field">
-      <label>จำนวนวันค่าชดเชย</label>
+      <label>จำนวนวัน × ${COMPANIES[companyVal].penalty_per_day} บ./วัน</label>
       <input data-fld="compensation_days" value="${v('compensation_days')}" placeholder="เช่น 12">
     </div>
     <div class="field wide">
@@ -283,8 +398,8 @@ function renderEditPanel() {
       <h3>ช่องทางชำระเงิน</h3>
     </div>
     <div class="field wide">
-      <label>เลขบัญชี ธ.กสิกรไทย</label>
-      <input data-fld="bank_account" value="${v('bank_account')}" placeholder="เช่น 123-4-56789-0">
+      <label>เลขบัญชี ธ.กสิกรไทย ${COMPANIES[companyVal].default_bank_account ? `<span class="hint">(เว้นว่าง = ใช้ ${COMPANIES[companyVal].default_bank_account})</span>` : ''}</label>
+      <input data-fld="bank_account" value="${v('bank_account')}" placeholder="${COMPANIES[companyVal].default_bank_account || 'เช่น 123-4-56789-0'}">
     </div>
   `;
 
@@ -298,9 +413,13 @@ function updateField(el) {
   const c = getCurrent();
   if (!c) return;
   c[el.dataset.fld] = el.value;
+  if (el.dataset.fld === 'company' && isDefaultRefNo(c.ref_no)) {
+    c.ref_no = genRefNo(c.company);
+  }
   save();
   renderPreview();
-  renderList(); // refresh list (name/contract may change)
+  renderList();
+  if (el.dataset.fld === 'company') renderEditPanel();
 }
 
 // ==================== PREVIEW ====================
@@ -325,18 +444,20 @@ function renderPreview() {
   const compDays = c.compensation_days
     ? `<b>${escapeHtml(c.compensation_days)}</b>`
     : '<span class="placeholder">__</span>';
-  const compTotal = c.compensation_days
-    ? formatBaht(parseFloat(c.compensation_days) * 100)
-    : '<span class="placeholder">__________</span>';
   const totalDue = c.total_due
     ? `${formatBaht(c.total_due)}`
     : '<span class="placeholder">_______________</span>';
   const discounted = c.discounted_amount
     ? `${formatBaht(c.discounted_amount)}`
     : '<span class="placeholder">_______________</span>';
-  const bankAcc = c.bank_account
-    ? `<span style="letter-spacing:1px">${escapeHtml(c.bank_account)}</span>`
+  const co = COMPANIES[c.company] || COMPANIES.cloud;
+  const bankAccValue = c.bank_account || co.default_bank_account || '';
+  const bankAcc = bankAccValue
+    ? `<span style="letter-spacing:1px">${escapeHtml(bankAccValue)}</span>`
     : '<span style="letter-spacing:1px">____-____-____</span>';
+  const compTotal = c.compensation_days
+    ? formatBaht(parseFloat(c.compensation_days) * co.penalty_per_day)
+    : '<span class="placeholder">__________</span>';
 
   preview.innerHTML = `
     <div class="page" id="letterPage">
@@ -348,7 +469,7 @@ function renderPreview() {
           </div>
           <div class="banner-meta">
             เลขที่ &nbsp; <b>${escapeHtml(c.ref_no || '—')}</b><br>
-            วันที่ &nbsp; <b>${escapeHtml(c.letter_date || '—')}</b>
+            วันที่ &nbsp; <b>${escapeHtml(formatThaiDate(c.letter_date) || '—')}</b>
           </div>
         </div>
       </div>
@@ -362,21 +483,21 @@ function renderPreview() {
 
       <div class="content">
         <div class="company">
-          <div class="logo"><img src="logo.png?v=6" alt="Thunder Cloud"></div>
+          <div class="logo"><img src="${escapeAttr(co.logo)}" alt="${escapeAttr(co.label)}"></div>
           <div class="name">
-            <h2>บริษัท ธันเดอร์คลาวด์ จำกัด</h2>
-            <div class="en">THUNDER CLOUD CO., LTD.  ·  เลขนิติบุคคล 0105568121078</div>
+            <h2>${escapeHtml(co.name_th)}</h2>
+            <div class="en">${escapeHtml(co.name_en)}  ·  เลขนิติบุคคล ${escapeHtml(co.juristic_id)}</div>
           </div>
           <div class="contact">
-            <b>สำนักงานใหญ่</b> &nbsp;เลขที่ 23 ซ.พัฒนาการ 69 ประเวศ กทม. 10250<br>
-            โทร. 098-018-9384 &nbsp;|&nbsp; legal@thundercloud.co.th<br>
-            Line Official: @thundercloud
+            <b>สำนักงานใหญ่</b> &nbsp;${escapeHtml(co.address)}<br>
+            โทร. ${escapeHtml(co.phone)} &nbsp;|&nbsp; ${escapeHtml(co.email)}<br>
+            Line Official: ${escapeHtml(co.line)}
           </div>
         </div>
 
         <div class="recipient">
           <div class="greet">เรียน คุณ <span class="nm">${escapeHtml(c.customer_name || '__________________')}</span></div>
-          <div class="label-note">ลูกค้าผู้ทำสัญญาเช่าโทรศัพท์มือถือกับบริษัท ธันเดอร์คลาวด์ จำกัด</div>
+          <div class="label-note">ลูกค้าผู้ทำสัญญา${escapeHtml(co.business_desc)}กับ${escapeHtml(co.name_th)}</div>
           <div class="lbl">เลขประจำตัวประชาชน</div>
           <div class="val">${escapeHtml(c.id_card || '—')}</div>
           <div class="lbl">ที่อยู่ตามสัญญา</div>
@@ -391,8 +512,8 @@ function renderPreview() {
         </div>
 
         <p class="intro">
-          ตามที่ท่านได้ทำสัญญาเช่าโทรศัพท์มือถือกับ <b>บริษัท ธันเดอร์คลาวด์ จำกัด</b>
-          เลขที่สัญญา <span class="pill">${escapeHtml(c.contract_no || 'GW-XXXX')}</span>
+          ตามที่ท่านได้ทำสัญญา${escapeHtml(co.business_desc)}กับ <b>${escapeHtml(co.name_th)}</b>
+          เลขที่สัญญา <span class="pill">${escapeHtml(c.contract_no || co.contract_prefix)}</span>
           ลงวันที่ <b>${escapeHtml(c.contract_date || '__ ____ 2569')}</b>
           โดยบริษัทได้ส่งมอบทรัพย์สินตามสัญญาให้แก่ท่านเรียบร้อยแล้ว ดังรายละเอียดต่อไปนี้
         </p>
@@ -407,10 +528,10 @@ function renderPreview() {
 
         <div class="section-title">ยอดหนี้ที่ค้างชำระ</div>
         <table class="detail">
-          <tr><td class="k">ค่าเช่าตามสัญญา (${escapeHtml(c.rate_unit || '—')})</td><td class="v">${escapeHtml(c.rate || '—')}</td></tr>
+          <tr><td class="k">${escapeHtml(co.rate_row_label)} (${escapeHtml(c.rate_unit || '—')})</td><td class="v">${escapeHtml(c.rate || '—')}</td></tr>
           <tr><td class="k">งวดที่ค้างชำระ</td><td class="v">${overduePer} งวด</td></tr>
-          <tr><td class="k">ยอดค่าเช่าค้างชำระ</td><td class="v">${overdueAmt} บาท</td></tr>
-          <tr><td class="k">ค่าชดเชย ข้อ 13 (100 บ./วัน)</td><td class="v">100 × ${compDays} วัน  =  ${compTotal} บาท</td></tr>
+          <tr><td class="k">${escapeHtml(co.overdue_row_label)}</td><td class="v">${overdueAmt} บาท</td></tr>
+          <tr><td class="k">${escapeHtml(co.penalty_row_label)}</td><td class="v">${co.penalty_per_day} × ${compDays} วัน  =  ${compTotal} บาท</td></tr>
         </table>
 
         <div class="total">
@@ -426,6 +547,8 @@ function renderPreview() {
           </div>
           <div class="note">* ไม่รวมดอกเบี้ย ค่าทนายความ และค่าใช้จ่ายในการดำเนินคดี</div>
         </div>
+
+        ${co.policy_html || ''}
 
         <p class="bridge">
           บริษัทได้ติดตามทวงถามท่านหลายครั้งแล้ว แต่ท่านยังคงเพิกเฉย มิได้ติดต่อชำระหนี้
@@ -454,8 +577,7 @@ function renderPreview() {
             <div>
               <h4>แจ้งความดำเนินคดีอาญา</h4>
               <p>
-                ความผิดฐาน "ฉ้อโกง" <span class="law-tag">ป.อาญา ม. 341</span> โทษจำคุกสูงสุด 3 ปี<br>
-                ความผิดฐาน "ยักยอกทรัพย์" <span class="law-tag">ป.อาญา ม. 352</span> โทษจำคุกสูงสุด 3 ปี และ/หรือปรับ
+                ${co.criminal_html}
               </p>
             </div>
           </div>
@@ -485,8 +607,8 @@ function renderPreview() {
         <div class="payment">
           <h4>💳 ช่องทางชำระเงิน</h4>
           <ul>
-            <li><b>ธนาคารกสิกรไทย</b> &nbsp; เลขบัญชี ${bankAcc} &nbsp; ชื่อบัญชี บจก. ธันเดอร์คลาวด์</li>
-            <li><b>Line Official:</b> @thundercloud &nbsp; • &nbsp; <b>โทรศัพท์:</b> 098-018-9384</li>
+            <li><b>ธนาคารกสิกรไทย</b> &nbsp; เลขบัญชี ${bankAcc} &nbsp; ชื่อบัญชี ${escapeHtml(co.bank_name)}</li>
+            <li><b>Line Official:</b> ${escapeHtml(co.line)} &nbsp; • &nbsp; <b>โทรศัพท์:</b> ${escapeHtml(co.phone)}</li>
           </ul>
           <div class="note">กรุณาแจ้งหลักฐานการโอนพร้อมเลขที่สัญญาทาง Line Official</div>
         </div>
@@ -494,8 +616,8 @@ function renderPreview() {
         <div class="signature">
           <div class="stamp">
             <span class="ring"></span>
-            <img src="logo.png?v=6" alt="">
-            <b>THUNDER CLOUD</b>
+            <img src="${escapeAttr(co.logo)}" alt="">
+            <b>${escapeHtml(co.stamp_th)}</b>
             <span>CO., LTD.</span>
           </div>
           <div class="sign">
@@ -504,7 +626,7 @@ function renderPreview() {
             <div>(ลงชื่อ) ________________________</div>
             <div class="role">ผู้จัดการฝ่ายกฎหมายและเร่งรัดหนี้สิน</div>
             <div class="role-en">Legal &amp; Collections Manager</div>
-            <div class="corp">บริษัท ธันเดอร์คลาวด์ จำกัด</div>
+            <div class="corp">${escapeHtml(co.name_th)}</div>
           </div>
         </div>
 

@@ -141,8 +141,8 @@ button { font-family: inherit; cursor: pointer; }
 .cust-card .name {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 4px;
-  padding-right: 60px;
+  margin: 6px 0 4px;
+  padding-right: 30px;
 }
 .cust-card .meta {
   font-size: 11px;
@@ -153,17 +153,26 @@ button { font-family: inherit; cursor: pointer; }
 }
 .cust-card .meta b { color: #ddd; font-weight: 600; }
 .cust-card .badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+  display: inline-block;
   background: rgba(192, 26, 26, 0.2);
   color: #ff8585;
   font-size: 9px;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 3px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  margin-right: 5px;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+.cust-card .badge.co-cloud {
+  background: rgba(56, 134, 255, 0.18);
+  color: #79b0ff;
+}
+.cust-card .badge.co-fin {
+  background: rgba(255, 200, 0, 0.18);
+  color: #ffd95c;
 }
 .cust-card .delete {
   position: absolute;
@@ -1054,4 +1063,74 @@ table.detail tr + tr td { border-top: 1px solid var(--line); }
   .edit-panel { grid-template-columns: 1fr; }
   .edit-panel .field.wide,
   .edit-panel .field.wide-2 { grid-column: span 1; }
+}
+
+/* Policy stages (Fin) */
+.policy {
+  background: #fdfbf5;
+  border: 1.5px solid #e7d9b3;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 14px 0;
+}
+.policy-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #d8c896;
+}
+.policy-head .ico { font-size: 22px; }
+.policy-head h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #8a6900;
+  letter-spacing: 0.3px;
+}
+.policy-stages {
+  display: grid;
+  gap: 8px;
+}
+.policy-stages .stage {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 9px 12px;
+  border-radius: 7px;
+  border-left: 4px solid;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.policy-stages .day {
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.policy-stages .act { color: #333; }
+.policy-stages .act b { font-weight: 700; }
+
+.stage.s-ok    { background: #f2f9f1; border-left-color: #4a9b3e; }
+.stage.s-ok    .day { background: #d8eed2; color: #2f6a26; }
+
+.stage.s-warn  { background: #fff8e8; border-left-color: #d99500; }
+.stage.s-warn  .day { background: #ffe9a8; color: #8a5e00; }
+.stage.s-warn  .act b { color: #b27500; }
+
+.stage.s-alert { background: #fff1ea; border-left-color: #e26b1a; }
+.stage.s-alert .day { background: #ffd6bf; color: #a04500; }
+.stage.s-alert .act b { color: #c2480d; }
+
+.stage.s-danger { background: #fdeeee; border-left-color: #c01a1a; }
+.stage.s-danger .day { background: #f7c8c8; color: #8a0d0d; }
+.stage.s-danger .act b { color: #a01010; }
+
+@media print {
+  .policy { break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .policy-stages .stage { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
